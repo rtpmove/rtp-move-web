@@ -1,57 +1,96 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import matter from 'gray-matter';
+import 'server-only';
+import { unstable_cache } from 'next/cache';
 import readingTime from 'reading-time';
 import { siteConfig } from '@/config/site';
+import { createPublicClient } from '@/lib/supabase/public';
 import type { BlogPostMeta } from '@/types';
 
-const BLOG_DIRECTORY = path.join(process.cwd(), 'src/content/blog');
+export { extractTableOfContents, slugifyHeading, type TocItem } from '@/lib/mdx-headings';
+
+/** Etiqueta de caché de los artículos. El panel la invalida al guardar o borrar. */
+export const POSTS_CACHE_TAG = 'posts';
+
+/** Fila de la tabla `posts` de Supabase (ver `supabase/schema.sql`). */
+export interface PostRow {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  content: string;
+  author: string | null;
+  cover_image: string | null;
+  tags: string[];
+  date: string;
+  status: 'draft' | 'published';
+  created_at: string;
+  updated_at: string;
+}
 
 interface RawPost {
   meta: BlogPostMeta;
   content: string;
 }
 
-function readPostFile(fileName: string): RawPost {
-  const slug = fileName.replace(/\.mdx$/, '');
-  const filePath = path.join(BLOG_DIRECTORY, fileName);
-  const fileContents = fs.readFileSync(filePath, 'utf8');
-  const { data, content } = matter(fileContents);
+export function defaultCoverImage(slug: string): string {
+  return `/blog-cover/${slug}`;
+}
 
+function toRawPost(row: PostRow): RawPost {
   const meta: BlogPostMeta = {
-    slug,
-    title: data.title,
-    description: data.description,
-    date: data.date,
-    updatedAt: data.updatedAt,
-    author: data.author ?? `Equipo ${siteConfig.name}`,
-    coverImage: data.coverImage,
-    tags: data.tags ?? [],
-    readingTime: readingTime(content, { wordsPerMinute: 200 }).text,
+    slug: row.slug,
+    title: row.title,
+    description: row.description,
+    date: row.date,
+    updatedAt: row.updated_at,
+    author: row.author || `Equipo ${siteConfig.name}`,
+    coverImage: row.cover_image || defaultCoverImage(row.slug),
+    tags: row.tags,
+    readingTime: readingTime(row.content, { wordsPerMinute: 200 }).text,
   };
 
-  return { meta, content };
+  return { meta, content: row.content };
 }
 
-export function getAllPosts(): BlogPostMeta[] {
-  if (!fs.existsSync(BLOG_DIRECTORY)) return [];
+// Las páginas del blog son estáticas: Supabase solo se consulta al compilar y cuando el
+// panel invalida la caché, no en cada visita. El listado guarda solo los metadatos para no
+// superar el tamaño máximo de una entrada de caché cuando haya muchos artículos.
+export const getAllPosts = unstable_cache(
+  async (): Promise<BlogPostMeta[]> => {
+    const { data, error } = await createPublicClient()
+      .from('posts')
+      .select('*')
+      .eq('status', 'published')
+      .order('date', { ascending: false });
 
-  return fs
-    .readdirSync(BLOG_DIRECTORY)
-    .filter((file) => file.endsWith('.mdx'))
-    .map((file) => readPostFile(file).meta)
-    .sort((a, b) => (a.date < b.date ? 1 : -1));
-}
+    if (error) throw new Error(`No se pudieron cargar los artículos: ${error.message}`);
+    return (data as PostRow[]).map((row) => toRawPost(row).meta);
+  },
+  ['published-posts'],
+  { tags: [POSTS_CACHE_TAG] },
+);
 
-export function getPostBySlug(slug: string): RawPost | null {
-  const filePath = path.join(BLOG_DIRECTORY, `${slug}.mdx`);
-  if (!fs.existsSync(filePath)) return null;
+export const getPostBySlug = unstable_cache(
+  async (slug: string): Promise<RawPost | null> => {
+    const { data, error } = await createPublicClient()
+      .from('posts')
+      .select('*')
+      .eq('status', 'published')
+      .eq('slug', slug)
+      .maybeSingle();
 
-  return readPostFile(`${slug}.mdx`);
-}
+    if (error) throw new Error(`No se pudo cargar el artículo "${slug}": ${error.message}`);
+    return data ? toRawPost(data as PostRow) : null;
+  },
+  ['published-post'],
+  { tags: [POSTS_CACHE_TAG] },
+);
 
-export function getRelatedPosts(currentSlug: string, tags: string[], limit = 3): BlogPostMeta[] {
-  return getAllPosts()
+export async function getRelatedPosts(
+  currentSlug: string,
+  tags: string[],
+  limit = 3,
+): Promise<BlogPostMeta[]> {
+  return (await getAllPosts())
     .filter((post) => post.slug !== currentSlug)
     .map((post) => ({
       post,
@@ -60,35 +99,4 @@ export function getRelatedPosts(currentSlug: string, tags: string[], limit = 3):
     .sort((a, b) => b.score - a.score)
     .slice(0, limit)
     .map(({ post }) => post);
-}
-
-export interface TocItem {
-  id: string;
-  text: string;
-  level: 2 | 3;
-}
-
-export function extractTableOfContents(content: string): TocItem[] {
-  const headingRegex = /^(##|###)\s+(.+)$/gm;
-  const items: TocItem[] = [];
-  let match: RegExpExecArray | null;
-
-  while ((match = headingRegex.exec(content)) !== null) {
-    const level = match[1].length === 2 ? 2 : 3;
-    const text = match[2].trim();
-    const id = slugifyHeading(text);
-    items.push({ id, text, level });
-  }
-
-  return items;
-}
-
-export function slugifyHeading(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-');
 }

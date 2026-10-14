@@ -1,4 +1,4 @@
-import type { TocItem } from '@/lib/blog';
+import type { TocItem } from '@/lib/mdx-headings';
 
 export function TableOfContents({ items }: { items: TocItem[] }) {
   if (items.length === 0) return null;

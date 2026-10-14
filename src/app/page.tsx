@@ -27,8 +27,8 @@ export const metadata: Metadata = features.onePage
       path: '/',
     });
 
-export default function HomePage() {
-  if (features.onePage) return <ProjectLanding posts={getAllPosts()} />;
+export default async function HomePage() {
+  if (features.onePage) return <ProjectLanding posts={await getAllPosts()} />;
 
   return (
     <>

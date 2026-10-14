@@ -85,7 +85,7 @@ export function articleSchema(post: BlogPostMeta) {
     '@type': 'MedicalWebPage',
     headline: post.title,
     description: post.description,
-    image: `${siteConfig.url}${post.coverImage}`,
+    image: new URL(post.coverImage, siteConfig.url).toString(),
     datePublished: post.date,
     dateModified: post.updatedAt ?? post.date,
     author: {

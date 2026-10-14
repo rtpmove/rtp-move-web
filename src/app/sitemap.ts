@@ -3,7 +3,7 @@ import { features } from '@/config/features';
 import { siteConfig } from '@/config/site';
 import { getAllPosts } from '@/lib/blog';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const homeRoute: MetadataRoute.Sitemap[number] = {
     url: siteConfig.url,
     lastModified: new Date(),
@@ -13,7 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   if (features.onePage) return [homeRoute];
 
-  const posts = getAllPosts();
+  const posts = await getAllPosts();
 
   const staticRoutes: MetadataRoute.Sitemap = [
     homeRoute,

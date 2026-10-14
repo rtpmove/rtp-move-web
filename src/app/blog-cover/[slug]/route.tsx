@@ -10,7 +10,7 @@ const GRADIENTS = [
 
 export async function GET(_request: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = await getPostBySlug(slug);
   const title = post?.meta.title ?? siteConfig.name;
   const gradientIndex = slug.length % GRADIENTS.length;
   const [from, to] = GRADIENTS[gradientIndex];

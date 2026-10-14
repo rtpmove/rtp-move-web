@@ -14,12 +14,19 @@ interface BlogSectionProps {
   description?: string;
 }
 
-export function BlogSection({ id, posts, eyebrow, title, description }: BlogSectionProps) {
+export async function BlogSection({ id, posts, eyebrow, title, description }: BlogSectionProps) {
   // El MDX se renderiza aquí, en el servidor, y el modal (cliente) solo recibe el resultado.
-  const readablePosts: ReadablePost[] = posts.map((meta) => ({
-    meta,
-    body: <MDXRemote source={getPostBySlug(meta.slug)?.content ?? ''} components={mdxComponents} />,
-  }));
+  const readablePosts: ReadablePost[] = await Promise.all(
+    posts.map(async (meta) => ({
+      meta,
+      body: (
+        <MDXRemote
+          source={(await getPostBySlug(meta.slug))?.content ?? ''}
+          components={mdxComponents}
+        />
+      ),
+    })),
+  );
 
   return (
     <section id={id} className="scroll-mt-8 py-20 sm:py-28">

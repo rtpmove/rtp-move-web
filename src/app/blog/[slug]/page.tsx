@@ -18,13 +18,13 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-export function generateStaticParams() {
-  return getAllPosts().map((post) => ({ slug: post.slug }));
+export async function generateStaticParams() {
+  return (await getAllPosts()).map((post) => ({ slug: post.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = await getPostBySlug(slug);
   if (!post) return {};
 
   return buildMetadata({
@@ -37,12 +37,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function BlogPostPage({ params }: PageProps) {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = await getPostBySlug(slug);
   if (!post) notFound();
 
   const { meta, content } = post;
   const toc = extractTableOfContents(content);
-  const relatedPosts = getRelatedPosts(slug, meta.tags);
+  const relatedPosts = await getRelatedPosts(slug, meta.tags);
   const breadcrumbItems = [
     { label: 'Inicio', href: '/' },
     { label: 'Blog', href: '/blog' },

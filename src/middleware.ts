@@ -1,13 +1,21 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { features } from '@/config/features';
+import { protectAdmin } from '@/lib/supabase/middleware';
 
-export function middleware(request: NextRequest) {
-  if (!features.onePage) return NextResponse.next();
+/** Rutas que siguen abiertas aunque el sitio esté en modo one page. */
+const ALWAYS_OPEN_API = ['/api/cron/'];
 
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // El panel de administración funciona siempre, esté o no activado el modo one page.
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) return protectAdmin(request);
+
+  if (!features.onePage) return NextResponse.next();
   if (pathname === '/') return NextResponse.next();
 
   if (pathname.startsWith('/api/')) {
+    if (ALWAYS_OPEN_API.some((prefix) => pathname.startsWith(prefix))) return NextResponse.next();
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 

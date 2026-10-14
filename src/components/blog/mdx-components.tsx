@@ -1,7 +1,7 @@
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 import Image from 'next/image';
 import { TriangleAlert } from 'lucide-react';
-import { slugifyHeading } from '@/lib/blog';
+import { slugifyHeading } from '@/lib/mdx-headings';
 import { cn } from '@/lib/utils';
 
 function headingWithId(Tag: 'h2' | 'h3') {
