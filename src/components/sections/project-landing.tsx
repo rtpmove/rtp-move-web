@@ -21,7 +21,7 @@ export function ProjectLanding({ posts }: { posts: BlogPostMeta[] }) {
           { label: 'Quiénes somos', href: `#${ABOUT_SECTION_ID}` },
           { label: 'Ver el blog', href: `#${BLOG_SECTION_ID}` },
         ]}
-        topSlot={<Logo className="text-neutral-0" />}
+        topSlot={<Logo className="text-neutral-0" markClassName="h-12 sm:h-14" />}
       />
       <AboutUs id={ABOUT_SECTION_ID} />
       <BlogSection

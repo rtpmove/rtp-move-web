@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { LogoMark } from '@/components/layout/logo';
 import { siteConfig } from '@/config/site';
 
 export function MobileNav() {
@@ -26,8 +27,9 @@ export function MobileNav() {
       </SheetTrigger>
       <SheetContent side="right" className="w-72">
         <SheetHeader>
-          <SheetTitle className="font-[family-name:var(--font-heading)]">
-            {siteConfig.name}
+          <SheetTitle className="text-neutral-900">
+            <LogoMark className="h-10" />
+            <span className="sr-only">{siteConfig.name}</span>
           </SheetTitle>
         </SheetHeader>
         <nav className="flex flex-col gap-1 px-4">

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { LogOut } from 'lucide-react';
 import { Container } from '@/components/shared/container';
+import { LogoMark } from '@/components/layout/logo';
 import { Button } from '@/components/ui/button';
 import { signOut } from '@/lib/actions/admin-auth';
 import { createSessionClient } from '@/lib/supabase/server';
@@ -24,7 +25,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="min-h-full bg-neutral-50">
       <header className="border-border/60 bg-neutral-0 border-b">
         <Container className="flex h-14 items-center justify-between gap-4">
-          <Link href="/admin" className="font-semibold text-neutral-900">
+          <Link href="/admin" className="flex items-center gap-3 font-semibold text-neutral-900">
+            <LogoMark className="h-9" />
             Panel del blog
           </Link>
           {user && (

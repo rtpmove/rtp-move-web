@@ -1,4 +1,5 @@
 import { Container } from '@/components/shared/container';
+import { LogoMark } from '@/components/layout/logo';
 import { InstagramIcon } from '@/components/shared/social-icons';
 import { aboutUs } from '@/lib/data/landing';
 import { Check, Mail } from 'lucide-react';
@@ -78,9 +79,10 @@ export function AboutUs({ id }: { id?: string }) {
             </a>
             ).
           </p>
-          <p className="border-border mt-10 border-t pt-8 text-xl font-semibold text-neutral-900 sm:text-2xl">
-            {aboutUs.signOff}
-          </p>
+          <div className="border-border mt-10 border-t pt-8">
+            <p className="text-xl font-semibold text-neutral-900 sm:text-2xl">{aboutUs.signOff}</p>
+            <LogoMark className="mt-6 h-14 text-neutral-900 sm:h-16" />
+          </div>
         </div>
       </Container>
     </section>

@@ -16,7 +16,7 @@ export function Footer() {
     <footer className="border-border/60 bg-muted border-t">
       <Container className="grid gap-10 py-16 sm:grid-cols-2 lg:grid-cols-4">
         <div className="flex flex-col gap-4 sm:col-span-2 lg:col-span-1">
-          <Logo />
+          <Logo className="self-start" markClassName="h-14" />
           <p className="text-muted-foreground max-w-xs text-sm leading-relaxed">
             {siteConfig.shortDescription}
           </p>

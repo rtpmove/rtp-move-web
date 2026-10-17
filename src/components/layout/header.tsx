@@ -10,7 +10,7 @@ export function Header() {
   return (
     <header className="border-border/60 bg-neutral-0/80 sticky top-0 z-40 border-b backdrop-blur-md">
       <Container className="flex h-16 items-center justify-between lg:h-20">
-        <Logo />
+        <Logo markClassName="h-11 lg:h-14" />
 
         <nav className="hidden items-center gap-8 lg:flex" aria-label="Navegación principal">
           {siteConfig.nav.map((item) => (
