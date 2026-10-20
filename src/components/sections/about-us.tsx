@@ -12,12 +12,12 @@ export function AboutUs({ id }: { id?: string }) {
     <section id={id} className="bg-muted scroll-mt-8 py-20 sm:py-28">
       <Container className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] lg:gap-20">
         <aside className="lg:sticky lg:top-12 lg:self-start">
-          <span className="text-secondary-600 text-sm font-semibold tracking-wide uppercase">
-            {aboutUs.eyebrow}
-          </span>
-          <h2 className="mt-4 text-3xl font-semibold text-balance text-neutral-900 sm:text-4xl">
+          <h2 className="text-3xl font-semibold text-balance text-neutral-900 sm:text-4xl">
             {aboutUs.title}
           </h2>
+          <span className="text-secondary-600 mt-4 block text-sm font-semibold tracking-wide uppercase">
+            {aboutUs.eyebrow}
+          </span>
 
           <ul className="mt-8 flex flex-col gap-3">
             {aboutUs.highlights.map((item) => (
