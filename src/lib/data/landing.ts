@@ -13,11 +13,11 @@ export const heroSlides: HeroSlide[] = [
     alt: 'David y Jorge, fisioterapeutas de RTP Move',
   },
   {
-    mobile: '/images/david-4x5.png',
+    mobile: '/images/David_blanco_negro.png',
     alt: 'David, fisioterapeuta de RTP Move',
   },
   {
-    mobile: '/images/jorge-4x5.png',
+    mobile: '/images/Jorge_blanco_negro.png',
     alt: 'Jorge, fisioterapeuta de RTP Move',
   },
 ];
