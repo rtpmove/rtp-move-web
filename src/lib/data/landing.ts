@@ -1,19 +1,23 @@
 export interface HeroSlide {
-  src: string;
+  /** Foto vertical (4x5) para móvil. */
+  mobile: string;
+  /** Foto horizontal para pantallas anchas. Sin ella, la diapositiva solo se muestra en móvil. */
+  desktop?: string;
   alt: string;
 }
 
 export const heroSlides: HeroSlide[] = [
   {
-    src: '/images/David%20y%20Jorge.png',
+    mobile: '/images/equipo-movil-4x5.png',
+    desktop: '/images/equipo-horizontal.png',
     alt: 'David y Jorge, fisioterapeutas de RTP Move',
   },
   {
-    src: '/images/David.png',
+    mobile: '/images/david-4x5.png',
     alt: 'David, fisioterapeuta de RTP Move',
   },
   {
-    src: '/images/Jorge.png',
+    mobile: '/images/jorge-4x5.png',
     alt: 'Jorge, fisioterapeuta de RTP Move',
   },
 ];

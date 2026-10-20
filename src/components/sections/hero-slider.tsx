@@ -6,11 +6,43 @@ import type { HeroSlide } from '@/lib/data/landing';
 import { cn } from '@/lib/utils';
 import { motion, useReducedMotion, type Variants } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
-import Image from 'next/image';
+import { getImageProps } from 'next/image';
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 
 const SLIDE_INTERVAL_MS = 3000;
+const DESKTOP_QUERY = '(min-width: 768px)';
+
+function subscribeDesktop(onChange: () => void) {
+  const mql = window.matchMedia(DESKTOP_QUERY);
+  mql.addEventListener('change', onChange);
+  return () => mql.removeEventListener('change', onChange);
+}
+
+/** En servidor se asume móvil; el <picture> ya elige la foto correcta antes de hidratar. */
+function useIsDesktop() {
+  return useSyncExternalStore(
+    subscribeDesktop,
+    () => window.matchMedia(DESKTOP_QUERY).matches,
+    () => false,
+  );
+}
+
+/** Foto con dirección de arte: horizontal en escritorio y 4x5 en móvil. */
+function SlideImage({ slide, priority }: { slide: HeroSlide; priority: boolean }) {
+  const common = { alt: slide.alt, fill: true, priority, sizes: '100vw' };
+  const { props: mobileProps } = getImageProps({ ...common, src: slide.mobile });
+  const desktopSrcSet = slide.desktop
+    ? getImageProps({ ...common, src: slide.desktop }).props.srcSet
+    : undefined;
+
+  return (
+    <picture>
+      {desktopSrcSet && <source media={DESKTOP_QUERY} srcSet={desktopSrcSet} sizes="100vw" />}
+      <img {...mobileProps} alt={slide.alt} className="object-cover" />
+    </picture>
+  );
+}
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 16 },
@@ -38,18 +70,28 @@ interface HeroSliderProps {
 }
 
 export function HeroSlider({
-  slides,
+  slides: allSlides,
   eyebrow,
   title,
   description,
   actions,
   topSlot,
 }: HeroSliderProps) {
-  const [current, setCurrent] = useState(0);
+  const isDesktop = useIsDesktop();
+  const desktopSlides = allSlides.filter((slide) => slide.desktop);
+  // En escritorio solo se usan las fotos horizontales (si no hay ninguna, se usan todas).
+  const slides = isDesktop && desktopSlides.length > 0 ? desktopSlides : allSlides;
+
+  const [selected, setCurrent] = useState(0);
+  // Al cambiar de móvil a escritorio cambia el número de diapositivas.
+  const current = selected % slides.length;
   const [paused, setPaused] = useState(false);
   const reduceMotion = useReducedMotion();
 
-  const next = useCallback(() => setCurrent((index) => (index + 1) % slides.length), [slides]);
+  const next = useCallback(
+    () => setCurrent((index) => ((index % slides.length) + 1) % slides.length),
+    [slides.length],
+  );
 
   useEffect(() => {
     if (paused || reduceMotion || slides.length < 2) return;
@@ -71,21 +113,14 @@ export function HeroSlider({
       >
         {slides.map((slide, index) => (
           <div
-            key={slide.src}
+            key={slide.mobile}
             role="group"
             aria-roledescription="diapositiva"
             aria-label={`${index + 1} de ${slides.length}`}
             aria-hidden={index !== current}
             className="relative h-full w-full shrink-0"
           >
-            <Image
-              src={slide.src}
-              alt={slide.alt}
-              fill
-              priority={index === 0}
-              sizes="100vw"
-              className="object-cover"
-            />
+            <SlideImage slide={slide} priority={index === 0} />
           </div>
         ))}
       </div>
@@ -167,7 +202,7 @@ export function HeroSlider({
             <div className="flex gap-2">
               {slides.map((slide, index) => (
                 <button
-                  key={slide.src}
+                  key={slide.mobile}
                   type="button"
                   onClick={() => setCurrent(index)}
                   aria-label={`Ver foto ${index + 1}`}
