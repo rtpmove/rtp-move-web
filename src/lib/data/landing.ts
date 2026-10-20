@@ -46,8 +46,8 @@ export const landingMeta = {
 };
 
 export const aboutUs = {
-  eyebrow: 'Quiénes somos',
-  title: 'Presentación',
+  eyebrow: 'Presentación',
+  title: 'Quiénes somos',
   highlights: [
     'Fisioterapeutas',
     'Graduados en Ciencias de la Actividad Física y del Deporte',
