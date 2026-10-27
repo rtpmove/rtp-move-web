@@ -61,13 +61,14 @@ create policy "Los admins borran artículos" on public.posts
 
 -- ─── Imágenes ───────────────────────────────────────────────────────────────
 -- Bucket público: cualquiera puede ver las imágenes por su URL, solo los admins suben o borran.
+-- Sin SVG: pueden llevar JavaScript.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values (
   'blog',
   'blog',
   true,
   5242880, -- 5 MB por imagen
-  array['image/png', 'image/jpeg', 'image/webp', 'image/avif', 'image/gif', 'image/svg+xml']
+  array['image/png', 'image/jpeg', 'image/webp', 'image/avif', 'image/gif']
 )
 on conflict (id) do update set
   public = excluded.public,

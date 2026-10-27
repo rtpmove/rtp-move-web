@@ -8,8 +8,13 @@ const nextConfig: NextConfig = {
     // Fotos de ejemplo del slider de la home (src/lib/data/landing.ts).
     remotePatterns: [
       { protocol: 'https', hostname: 'images.unsplash.com' },
-      // Imágenes del blog subidas desde /admin a Supabase Storage.
-      { protocol: 'https', hostname: '*.supabase.co', pathname: '/storage/v1/object/public/**' },
+      // Imágenes del blog subidas desde /admin a Supabase Storage. Solo nuestro proyecto: con
+      // `*.supabase.co` el optimizador procesaría imágenes de cualquier proyecto de Supabase.
+      {
+        protocol: 'https',
+        hostname: 'peoqraznkiskvgrutlmx.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
     ],
   },
 };
