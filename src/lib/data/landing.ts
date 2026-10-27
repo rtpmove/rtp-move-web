@@ -47,7 +47,7 @@ export const landingMeta = {
 
 export const aboutUs = {
   eyebrow: 'Quiénes somos',
-  title: 'Somos David y Jorge',
+  title: 'Presentación',
   highlights: [
     'Fisioterapeutas',
     'Graduados en Ciencias de la Actividad Física y del Deporte',

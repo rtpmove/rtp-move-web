@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Analytics } from '@vercel/analytics/next';
 import { poppins, openSans } from '@/lib/fonts';
 import { siteConfig } from '@/config/site';
 import { buildMetadata } from '@/lib/seo/metadata';
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
         </main>
         {features.onePage ? <LandingFooter /> : <Footer />}
+        <Analytics />
       </body>
     </html>
   );
