@@ -94,6 +94,34 @@ create policy "Los admins borran imágenes del blog" on storage.objects
   for delete to authenticated
   using (bucket_id = 'blog' and public.is_admin());
 
+-- ─── Keep-alive ─────────────────────────────────────────────────────────────
+-- Supabase pausa los proyectos gratuitos con poca actividad y una lectura diaria no basta,
+-- así que el cron de /api/cron/keep-alive escribe aquí cada día. Tabla de una sola fila
+-- y sin políticas: solo se modifica a través de la función.
+create table if not exists public.keep_alive (
+  id smallint primary key default 1 check (id = 1),
+  runs bigint not null default 0,
+  last_run timestamptz not null default now()
+);
+alter table public.keep_alive enable row level security;
+revoke all on public.keep_alive from anon, authenticated;
+
+-- security definer para que la llame la clave pública: la secret key no se guarda en Vercel.
+-- Lo peor que puede hacer quien la llame es subir el contador.
+create or replace function public.keep_alive()
+returns bigint
+language sql
+security definer
+set search_path = ''
+as $$
+  insert into public.keep_alive as k (id, runs, last_run)
+  values (1, 1, now())
+  on conflict (id) do update set runs = k.runs + 1, last_run = now()
+  returning k.runs;
+$$;
+revoke all on function public.keep_alive() from public, anon, authenticated;
+grant execute on function public.keep_alive() to anon, service_role;
+
 -- ─── Dar permisos de admin ──────────────────────────────────────────────────
 -- Primero crea tu usuario en Authentication → Users → Add user (con contraseña).
 -- Después ejecuta esto cambiando el email:
