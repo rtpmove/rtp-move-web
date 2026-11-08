@@ -93,20 +93,26 @@ function Branches({ children }: { children: ReactNode }) {
 }
 
 const branchTones = {
-  primary: {
+  azul: {
     box: 'border-ocean-200 bg-ocean-50 border-t-ocean-500',
     badge: 'bg-ocean-500 text-neutral-0',
     title: 'text-ocean-700',
     marker: '[&_li::marker]:text-ocean-500',
     Icon: CircleCheck,
   },
-  secondary: {
+  arena: {
     box: 'border-sand-200 bg-sand-50 border-t-sand-500',
     badge: 'bg-sand-500 text-neutral-0',
     title: 'text-sand-700',
     marker: '[&_li::marker]:text-sand-500',
     Icon: CircleAlert,
   },
+};
+
+// Estilo original (verde / burdeos): lo siguen usando los artículos ya publicados.
+const legacyBranchTones = {
+  primary: { box: 'border-primary-200 bg-primary-50/60', title: 'text-primary-700' },
+  secondary: { box: 'border-secondary-200 bg-secondary-50/60', title: 'text-secondary-600' },
 };
 
 /** Rama de una decisión (p. ej. «Si la respuesta es sí»). */
@@ -116,10 +122,23 @@ function Branch({
   children,
 }: {
   title: string;
-  tone?: keyof typeof branchTones;
+  tone?: keyof typeof branchTones | keyof typeof legacyBranchTones;
   children: ReactNode;
 }) {
-  const t = branchTones[tone] ?? branchTones.primary;
+  if (tone === 'primary' || tone === 'secondary' || !(tone in branchTones)) {
+    const l =
+      legacyBranchTones[tone as keyof typeof legacyBranchTones] ?? legacyBranchTones.primary;
+    return (
+      <div className={cn('rounded-xl border p-5', l.box)}>
+        <p className={cn('text-xs font-semibold tracking-wide uppercase', l.title)}>{title}</p>
+        {/* El contenido puede llegar como párrafos o como texto suelto según cómo se escriba el MDX. */}
+        <div className="text-muted-foreground mt-2 text-[0.95rem] leading-relaxed [&>p]:text-[0.95rem] [&>p:first-child]:mt-0">
+          {children}
+        </div>
+      </div>
+    );
+  }
+  const t = branchTones[tone as keyof typeof branchTones];
   return (
     <div
       className={cn(
@@ -171,17 +190,29 @@ const calloutTones = {
   },
 };
 
-/** Aviso destacado: `<Callout title="Con cautela" tone="aviso|lectura|curiosidad">…</Callout>`. */
+/** Aviso destacado: `<Callout title="Con cautela">…</Callout>`. Con `tone="aviso|lectura|curiosidad"` usa el diseño nuevo. */
 function Callout({
   title,
-  tone = 'aviso',
+  tone,
   children,
 }: {
   title?: string;
   tone?: keyof typeof calloutTones;
   children: ReactNode;
 }) {
-  const t = calloutTones[tone] ?? calloutTones.aviso;
+  // Sin `tone`: estilo original, el que usan los artículos ya publicados.
+  if (!tone || !(tone in calloutTones)) {
+    return (
+      <aside className="border-secondary-200 bg-secondary-50 mt-5 flex gap-3 rounded-xl border p-4">
+        <TriangleAlert className="text-secondary-600 mt-0.5 size-5 shrink-0" />
+        <div className="text-sm leading-relaxed text-neutral-700 [&>p]:mt-0 [&>p]:text-sm [&>p]:text-neutral-700">
+          {title && <strong className="text-secondary-700 font-semibold">{title}: </strong>}
+          {children}
+        </div>
+      </aside>
+    );
+  }
+  const t = calloutTones[tone];
   return (
     <aside
       className={cn(
