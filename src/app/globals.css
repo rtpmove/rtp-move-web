@@ -45,6 +45,22 @@
   --color-neutral-900: #1a1815;
   --color-neutral-950: #100f0d;
 
+  /* Cajas del blog: azul petróleo (positivo / información) */
+  --color-ocean-50: #edf5f8;
+  --color-ocean-100: #d3e7ee;
+  --color-ocean-200: #a7cedc;
+  --color-ocean-500: #3b7f9a;
+  --color-ocean-600: #2e6880;
+  --color-ocean-700: #245366;
+
+  /* Cajas del blog: arena / ámbar (precaución / avisos) */
+  --color-sand-50: #fdf6e9;
+  --color-sand-100: #f9e8c6;
+  --color-sand-200: #f1d08d;
+  --color-sand-500: #c98a1b;
+  --color-sand-600: #a66f12;
+  --color-sand-700: #7f5410;
+
   /* Typography */
   --font-heading: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
   --font-body: var(--font-open-sans), ui-sans-serif, system-ui, sans-serif;

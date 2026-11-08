@@ -1,6 +1,6 @@
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 import Image from 'next/image';
-import { TriangleAlert } from 'lucide-react';
+import { CircleAlert, CircleCheck, CircleHelp, Lightbulb, TriangleAlert } from 'lucide-react';
 import { slugifyHeading } from '@/lib/mdx-headings';
 import { cn } from '@/lib/utils';
 
@@ -89,12 +89,24 @@ function Step({
 
 /** Agrupa varias `<Branch>` en columnas. */
 function Branches({ children }: { children: ReactNode }) {
-  return <div className="mt-6 grid gap-4 sm:grid-cols-2">{children}</div>;
+  return <div className="mt-8 grid gap-4 sm:grid-cols-2">{children}</div>;
 }
 
 const branchTones = {
-  primary: { box: 'border-primary-200 bg-primary-50/60', title: 'text-primary-700' },
-  secondary: { box: 'border-secondary-200 bg-secondary-50/60', title: 'text-secondary-600' },
+  primary: {
+    box: 'border-ocean-200 bg-ocean-50 border-t-ocean-500',
+    badge: 'bg-ocean-500 text-neutral-0',
+    title: 'text-ocean-700',
+    marker: '[&_li::marker]:text-ocean-500',
+    Icon: CircleCheck,
+  },
+  secondary: {
+    box: 'border-sand-200 bg-sand-50 border-t-sand-500',
+    badge: 'bg-sand-500 text-neutral-0',
+    title: 'text-sand-700',
+    marker: '[&_li::marker]:text-sand-500',
+    Icon: CircleAlert,
+  },
 };
 
 /** Rama de una decisión (p. ej. «Si la respuesta es sí»). */
@@ -107,29 +119,103 @@ function Branch({
   tone?: keyof typeof branchTones;
   children: ReactNode;
 }) {
+  const t = branchTones[tone] ?? branchTones.primary;
   return (
-    <div className={cn('rounded-xl border p-5', branchTones[tone].box)}>
-      <p className={cn('text-xs font-semibold tracking-wide uppercase', branchTones[tone].title)}>
-        {title}
-      </p>
+    <div
+      className={cn(
+        'rounded-2xl border border-t-4 p-5 shadow-sm transition duration-300 ease-out hover:-translate-y-1 hover:shadow-md',
+        t.box,
+      )}
+    >
+      <div className="flex items-center gap-2.5">
+        <span
+          className={cn('flex size-8 shrink-0 items-center justify-center rounded-full', t.badge)}
+        >
+          <t.Icon className="size-4.5" />
+        </span>
+        <p className={cn('font-heading text-sm font-semibold tracking-wide uppercase', t.title)}>
+          {title}
+        </p>
+      </div>
       {/* El contenido puede llegar como párrafos o como texto suelto según cómo se escriba el MDX. */}
-      <div className="text-muted-foreground mt-2 text-[0.95rem] leading-relaxed [&>p]:text-[0.95rem] [&>p:first-child]:mt-0">
+      <div
+        className={cn(
+          'mt-3 text-[0.95rem] leading-relaxed text-neutral-700 [&>p]:text-[0.95rem] [&>p]:text-neutral-700 [&>p:first-child]:mt-0 [&>ul]:mt-2',
+          t.marker,
+        )}
+      >
         {children}
       </div>
     </div>
   );
 }
 
-/** Aviso destacado: `<Callout title="Con cautela">…</Callout>`. */
-function Callout({ title, children }: { title?: string; children: ReactNode }) {
+const calloutTones = {
+  aviso: {
+    box: 'border-sand-200 bg-sand-50 border-l-sand-500',
+    badge: 'bg-sand-500 text-neutral-0',
+    title: 'text-sand-700',
+    Icon: TriangleAlert,
+  },
+  lectura: {
+    box: 'border-ocean-200 bg-ocean-50 border-l-ocean-500',
+    badge: 'bg-ocean-500 text-neutral-0',
+    title: 'text-ocean-700',
+    Icon: Lightbulb,
+  },
+  curiosidad: {
+    box: 'border-neutral-200 bg-neutral-100 border-l-neutral-500',
+    badge: 'bg-neutral-700 text-neutral-0',
+    title: 'text-neutral-800',
+    Icon: CircleHelp,
+  },
+};
+
+/** Aviso destacado: `<Callout title="Con cautela" tone="aviso|lectura|curiosidad">…</Callout>`. */
+function Callout({
+  title,
+  tone = 'aviso',
+  children,
+}: {
+  title?: string;
+  tone?: keyof typeof calloutTones;
+  children: ReactNode;
+}) {
+  const t = calloutTones[tone] ?? calloutTones.aviso;
   return (
-    <aside className="border-secondary-200 bg-secondary-50 mt-5 flex gap-3 rounded-xl border p-4">
-      <TriangleAlert className="text-secondary-600 mt-0.5 size-5 shrink-0" />
-      <div className="text-sm leading-relaxed text-neutral-700 [&>p]:mt-0 [&>p]:text-sm [&>p]:text-neutral-700">
-        {title && <strong className="text-secondary-700 font-semibold">{title}: </strong>}
+    <aside
+      className={cn(
+        'mt-8 flex gap-4 rounded-2xl border border-l-4 p-5 shadow-sm transition duration-300 ease-out hover:shadow-md',
+        t.box,
+      )}
+    >
+      <span
+        className={cn('flex size-9 shrink-0 items-center justify-center rounded-full', t.badge)}
+      >
+        <t.Icon className="size-5" />
+      </span>
+      <div className="min-w-0 text-[0.95rem] leading-relaxed text-neutral-700 [&>p]:text-[0.95rem] [&>p]:text-neutral-700 [&>p:first-of-type]:mt-1">
+        {title && (
+          <p className={cn('font-heading !mt-1.5 text-base font-semibold', t.title)}>{title}</p>
+        )}
         {children}
       </div>
     </aside>
+  );
+}
+
+/** Agrupa varios `<Stat>` en una fila de cifras destacadas. */
+function Stats({ children }: { children: ReactNode }) {
+  return <div className="mt-8 grid gap-4 sm:auto-cols-fr sm:grid-flow-col">{children}</div>;
+}
+
+/** Cifra destacada: `<Stat value="−8 mmHg" label="Tensión sistólica" />`. */
+function Stat({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="border-ocean-200 bg-neutral-0 rounded-2xl border p-5 text-center shadow-sm transition duration-300 ease-out hover:-translate-y-1 hover:shadow-md">
+      <p className="font-heading text-ocean-600 text-3xl font-bold sm:text-4xl">{value}</p>
+      <p className="mt-2 text-sm leading-snug text-neutral-600">{label}</p>
+    </div>
   );
 }
 
@@ -139,6 +225,8 @@ export const mdxComponents = {
   Branches,
   Branch,
   Callout,
+  Stats,
+  Stat,
   h2: headingWithId('h2'),
   h3: headingWithId('h3'),
   p: (props: ComponentPropsWithoutRef<'p'>) => (
