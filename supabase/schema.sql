@@ -108,6 +108,8 @@ create table if not exists public.post_questions (
 );
 create index if not exists post_questions_created_idx on public.post_questions (created_at desc);
 alter table public.post_questions enable row level security;
+grant insert on public.post_questions to anon, authenticated;
+grant select, update, delete on public.post_questions to authenticated;
 
 drop policy if exists "Cualquiera envía dudas" on public.post_questions;
 create policy "Cualquiera envía dudas" on public.post_questions
