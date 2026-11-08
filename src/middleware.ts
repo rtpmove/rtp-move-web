@@ -13,6 +13,8 @@ export async function middleware(request: NextRequest) {
 
   if (!features.onePage) return NextResponse.next();
   if (pathname === '/') return NextResponse.next();
+  // TEMPORAL: vista previa del nuevo diseño de cajas del blog. Borrar antes de fusionar.
+  if (pathname.startsWith('/blog-preview/')) return NextResponse.next();
 
   if (pathname.startsWith('/api/')) {
     if (ALWAYS_OPEN_API.some((prefix) => pathname.startsWith(prefix))) return NextResponse.next();
