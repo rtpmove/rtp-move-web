@@ -25,10 +25,25 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="min-h-full bg-neutral-50">
       <header className="border-border/60 bg-neutral-0 border-b">
         <Container className="flex h-14 items-center justify-between gap-4">
-          <Link href="/admin" className="flex items-center gap-3 font-semibold text-neutral-900">
-            <LogoMark className="h-9" />
-            Panel del blog
-          </Link>
+          <div className="flex items-center gap-6">
+            <Link href="/admin" className="flex items-center gap-3 font-semibold text-neutral-900">
+              <LogoMark className="h-9" />
+              Panel del blog
+            </Link>
+            {user && (
+              <nav className="flex items-center gap-4 text-sm">
+                <Link href="/admin" className="text-muted-foreground hover:text-foreground">
+                  Artículos
+                </Link>
+                <Link
+                  href="/admin/preguntas"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  Dudas
+                </Link>
+              </nav>
+            )}
+          </div>
           {user && (
             <div className="flex items-center gap-3 text-sm">
               <span className="text-muted-foreground hidden sm:inline">{user.email}</span>

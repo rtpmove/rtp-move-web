@@ -95,6 +95,41 @@ create policy "Los admins borran imágenes del blog" on storage.objects
   for delete to authenticated
   using (bucket_id = 'blog' and public.is_admin());
 
+-- ─── Dudas de los lectores ──────────────────────────────────────────────────
+-- Las envía el formulario "¿Te ha quedado alguna duda?" de cada artículo.
+-- Cualquiera puede enviar una, pero solo los admins pueden leerlas, marcarlas o borrarlas.
+create table if not exists public.post_questions (
+  id uuid primary key default gen_random_uuid(),
+  post_slug text not null check (char_length(post_slug) between 1 and 200),
+  email text not null check (char_length(email) between 3 and 320),
+  question text not null check (char_length(question) between 10 and 1000),
+  answered boolean not null default false,
+  created_at timestamptz not null default now()
+);
+create index if not exists post_questions_created_idx on public.post_questions (created_at desc);
+alter table public.post_questions enable row level security;
+
+drop policy if exists "Cualquiera envía dudas" on public.post_questions;
+create policy "Cualquiera envía dudas" on public.post_questions
+  for insert to anon, authenticated
+  with check (answered = false);
+
+drop policy if exists "Los admins leen las dudas" on public.post_questions;
+create policy "Los admins leen las dudas" on public.post_questions
+  for select to authenticated
+  using (public.is_admin());
+
+drop policy if exists "Los admins marcan las dudas" on public.post_questions;
+create policy "Los admins marcan las dudas" on public.post_questions
+  for update to authenticated
+  using (public.is_admin())
+  with check (public.is_admin());
+
+drop policy if exists "Los admins borran las dudas" on public.post_questions;
+create policy "Los admins borran las dudas" on public.post_questions
+  for delete to authenticated
+  using (public.is_admin());
+
 -- ─── Keep-alive ─────────────────────────────────────────────────────────────
 -- Supabase pausa los proyectos gratuitos con poca actividad y una lectura diaria no basta,
 -- así que el cron de /api/cron/keep-alive escribe aquí cada día. Tabla de una sola fila

@@ -42,6 +42,15 @@ export function PostQuestionForm({ postSlug, className }: PostQuestionFormProps)
 
           <form action={formAction} className="mt-6 flex flex-col gap-5" noValidate>
             <input type="hidden" name="postSlug" value={postSlug} />
+            {/* Campo trampa para bots: invisible para las personas. */}
+            <input
+              type="text"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="hidden"
+            />
 
             <div className="flex flex-col gap-2">
               <Label htmlFor={`${postSlug}-email`}>Tu email</Label>
@@ -75,6 +84,8 @@ export function PostQuestionForm({ postSlug, className }: PostQuestionFormProps)
                 <p className="text-destructive text-sm">{state.fieldErrors.question[0]}</p>
               )}
             </div>
+
+            {state.formError && <p className="text-destructive text-sm">{state.formError}</p>}
 
             <Button
               type="submit"

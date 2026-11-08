@@ -98,8 +98,7 @@ export async function deletePost(id: string) {
 }
 
 export type PreviewResult =
-  | { ok: true; source: MDXRemoteSerializeResult }
-  | { ok: false; error: string };
+  { ok: true; source: MDXRemoteSerializeResult } | { ok: false; error: string };
 
 /** Compila el MDX del editor para la vista previa. */
 export async function previewMdx(content: string): Promise<PreviewResult> {
