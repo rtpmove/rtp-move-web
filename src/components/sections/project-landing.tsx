@@ -24,13 +24,7 @@ export function ProjectLanding({ posts }: { posts: BlogPostMeta[] }) {
         topSlot={<Logo className="text-neutral-0" markClassName="h-12 sm:h-14" />}
       />
       <AboutUs id={ABOUT_SECTION_ID} />
-      <BlogSection
-        id={BLOG_SECTION_ID}
-        posts={posts}
-        eyebrow="Nuestro blog"
-        title="Lo que vamos compartiendo"
-        description="Artículos y consejos prácticos de fisioterapia escritos por nuestro equipo."
-      />
+      <BlogSection id={BLOG_SECTION_ID} posts={posts} title="Nuestro blog" />
     </>
   );
 }
